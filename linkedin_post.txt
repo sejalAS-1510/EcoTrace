@@ -1,33 +1,35 @@
-🚀 Zero dependencies. 100% secure. Deployed. Built in public.
+⚡ Zero frameworks. Maximum performance. Deployed.
 
-I have engineered and deployed EcoTrace—an advanced, secure, and fully accessible Carbon Footprint Dashboard for the Carbon Footprint Awareness Platform mini-challenge. 🌍
 
-Here is a summary of the architectural and technical decisions behind this bare-metal build:
 
-🛠️ The Tech Stack & Architecture
+I have engineered and deployed EcoTrace—a secure, lightweight, and fully accessible Carbon Footprint Dashboard built for the Carbon Footprint Awareness Platform mini-challenge. 🌍
 
-Frontend: Semantic HTML5, Vanilla CSS3, and Modular ES6+ JavaScript.
 
-Data Visualization: Built using raw SVG elements and trigonometric arcs, avoiding heavy libraries like Chart.js or D3.
 
-Server & Deployment: Native Node.js HTTP and File System modules (zero package.json dependencies), deployed to Vercel Serverless CDNs using custom edge security configurations (vercel.json).
+Here is a quick overview of how it was built:
 
-Testing: Node.js native test runner (node:test and node:assert) for decimal and boundary validations, achieving a 100% test pass rate.
+🛠️ The Tech Stack: Pure HTML5, Vanilla CSS3, and Modular ES6+ JavaScript. No frameworks or heavy libraries.
 
-🔒 Production-Grade Security & Compliance
+📊 Lightweight Data Viz: Dynamic donut charts built using raw SVG and basic trigonometry instead of Chart.js or D3.
 
-Security Hardening: Implemented directory traversal mitigation alongside strict HTTP headers, including a robust Content Security Policy (CSP), X-Frame-Options: DENY, and X-Content-Type-Options: nosniff.
+🔒 Production-Level Security: Built a custom Node.js server deployed via Vercel, hardened with directory traversal protection and strict HTTP security headers (CSP, DENY, nosniff).
 
-WCAG 2.1 AA Accessibility: Integrated full WAI-ARIA keyboard navigation across dashboard tabs, dynamic error binding (aria-invalid/aria-describedby), and polite live regions (aria-live) for real-time assistive technology announcements.
+♿ Inclusive Design: Fully WCAG 2.1 AA compliant, featuring comprehensive WAI-ARIA keyboard navigation and live screen reader announcements (aria-live).
 
-🤖 Offline-First Intelligence
+🤖 Offline AI: Features EcoBot, a completely client-side assistant that tracks habits and calculates targets locally.
 
-Developed EcoBot, a client-side assistant that parses user carbon habits locally to compute targets and outline transport savings without external API overhead.
+🧪 Native Testing: Uses the native node:test runner to guarantee a 100% test pass rate with zero external dependencies.
 
-Building this from the ground up offered an excellent opportunity to balance strict security compliance, optimal performance, and inclusive design using native web APIs.
 
-The complete codebase and live application are available below. 👇
+
+Building this from scratch was a fantastic exercise in maximizing performance, accessibility, and security using native web APIs.
+
+
+
+Explore the repository and live deployment here: 👇
 
 🔗 https://github.com/sejalAS-1510/EcoTrace
+
+
 
 #BuildInPublic #GreenTech #VanillaJS #WebSecurity #WebAccessibility #CleanCode #SoftwareEngineering #OpenSource #Vercel
