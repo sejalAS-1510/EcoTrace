@@ -1,0 +1,32 @@
+🚀 Zero dependencies. 100% secure. Built in public.
+
+I've spent the last few days engineering "EcoTrace" – an advanced, secure, and accessible Carbon Footprint Dashboard for the Carbon Footprint Awareness Platform mini-challenge! 🌍
+
+Here is a summary of the technical decisions that drove this build:
+
+💡 Zero-Dependency Performance
+Rather than installing heavy libraries like React or Chart.js, I wrote the entire frontend in semantic HTML5, Vanilla CSS Variables, and modular ES6+ JavaScript. The dynamic donut chart is calculated using raw SVG elements and trigonometry, leading to instant loads and a secure application footprint with no vulnerable modules.
+
+🔒 Production-Level Security
+Public repositories require solid code safety. I developed a custom Node.js development server equipped with:
+- Directory Traversal Mitigation (to prevent directory-level file reads)
+- Hardened HTTP Headers: CSP (Content Security Policy) to prevent cross-site scripting (XSS), X-Frame-Options (DENY) to stop clickjacking, and X-Content-Type-Options.
+
+♿ Inclusive Accessibility
+Accessibility is not an afterthought. EcoTrace is WCAG 2.1 AA compliant, integrating:
+- WAI-ARIA keyboard navigation for dashboard tabs.
+- Dynamic error binding with `aria-invalid` and `aria-describedby` links.
+- Polite live region announcements (`aria-live`) for calculation results.
+
+🤖 Logical context-aware AI
+Designed "EcoBot" – a client-side dynamic chatbot that analyzes user carbon habits. It dynamically computes custom targets, highlights their largest emission sources, and outlines transport savings, ensuring a highly responsive offline experience.
+
+🧪 Rigorous Automated Testing
+Leveraged Node's native `node:test` runner to execute extensive boundary and decimal validations on our emission factors, keeping the codebase reliable and maintaining a 100% test pass rate.
+
+It’s been an incredible experience building this from scratch and refining it for maximum compliance, speed, and design depth.
+
+Check out the code in the public repo here! 👇
+[Insert repository link]
+
+#BuildInPublic #GreenTech #VanillaJS #WebDevelopment #WebSecurity #WebAccessibility #CleanCode #OpenSource
