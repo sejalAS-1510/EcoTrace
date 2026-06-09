@@ -1,111 +1,166 @@
-# Engineering a Zero-Dependency, Secure, and Fully Accessible Carbon Dashboard
+# Behind the Code: Engineering a Zero-Dependency, Secure, and Fully Accessible Carbon Dashboard
 
-Building modern web applications often tempts developers to reach for heavy frameworks (like React or Next.js) and third-party libraries (like Chart.js or Tailwind). However, this introduces substantial page load overhead, potential supply-chain security vulnerabilities, and accessibility challenges.
+In this post, I will break down the engineering decisions, coding patterns, and security practices implemented to build **EcoTrace**—a zero-dependency, secure-by-default, and highly interactive carbon awareness dashboard.
 
-For the **Carbon Footprint Awareness Platform** mini-challenge, I engineered **EcoTrace**—a zero-dependency, secure-by-default, and highly interactive eco-dashboard using pure HTML5, Vanilla CSS, and ES6+ JavaScript.
-
-Here is a deep dive into the technical decisions, architecture, and security practices implemented to build a leaderboard-winning submission.
+Every line of code in the repository was built to demonstrate clean engineering, full accessibility (a11y), edge-level security, and high performance.
 
 ---
 
-## 🏗️ 1. Architecture: Zero Dependencies, Maximum Efficiency
+## 📂 Project Architecture
 
-The runtime footprint of EcoTrace is close to **zero**. There are no build steps, no webpack configurations, and no `node_modules` required to serve the frontend. 
+The repository is structured logically to separate user interface, business logic, testing, and deployment configurations:
 
-- **Frontend**: Single-page architecture managed via native ES modules.
-- **Styling**: Structured Vanilla CSS utilizing custom properties (CSS variables) to handle theme tokens dynamically, supporting a default **Forest Dark** theme and a high-contrast **Fresh Light** theme.
-- **Icons**: Crisp inline SVG elements. Avoiding external CDNs (like FontAwesome) protects the app against cross-site script injections (XSS) and network latency.
+- `index.html`: Holds the semantic layout, accessible WAI-ARIA tabs, calculator forms, and chat widgets.
+- `styles.css`: Centralizes modern style tokens, layouts, transitions, and the Forest Dark & Fresh Light themes.
+- `server.js`: A secure, zero-dependency local static server.
+- `vercel.json`: Configuration for serverless static hosting and edge security rules.
+- `src/calculator.js`: Contains calculation constants, input boundary validation, and recommendation models.
+- `src/app.js`: Coordinates DOM state updates, SVG chart drawing, keyboard listeners, and the client-side EcoBot chatbot.
+- `tests/calculator.test.js`: Contains comprehensive unit tests for calculations and validation rules.
 
 ---
 
-## 📊 2. Dynamic SVG Donut Chart Engine
+## 🛠️ 1. Validation & Calculation Logic (`calculator.js`)
 
-Typically, developers rely on libraries like Chart.js or D3 to render breakdowns. In EcoTrace, the donut chart is drawn **dynamically from scratch** using native SVG `<circle>` elements and trigonometry.
-
-### How it works:
-1. The circumference ($C$) of the donut circle is calculated based on its radius ($r = 35$):
-   $$C = 2 \pi r \approx 219.91$$
-2. Using the `stroke-dasharray` attribute set to $C$, we control the visible segment length of the circle.
-3. The `stroke-dashoffset` determines the hidden portion of the border, computed as:
-   $$\text{offset} = C - (\text{percentage} \times C)$$
-4. Slices are stacked and rotated sequentially based on the accumulated percentage to form a complete $360^\circ$ circle.
+At the core of the app is the emission coefficient engine. We lock coefficients in a frozen dictionary `EMISSION_FACTORS` to prevent runtime mutation:
 
 ```javascript
-// Truncated snippet from app.js
-for (const [key, value] of Object.entries(components)) {
-  const percent = value / total;
-  const strokeOffset = circ - (percent * circ);
-  const rotation = accumulatedPercent * 360 - 90; // Align top start (-90deg)
-  
-  svgContent += `
-    <circle 
-      cx="50" cy="50" r="${radius}" 
-      fill="transparent" 
-      stroke="${colors[key]}" stroke-width="10" 
-      stroke-dasharray="${circ}" stroke-dashoffset="${strokeOffset}" 
-      transform="rotate(${rotation} 50 50)"
-      class="chart-slice"
-      role="img" aria-label="${labels[key]}: ${value.toFixed(0)} kg CO₂e (${(percent * 100).toFixed(0)}%)"
-    />`;
-  accumulatedPercent += percent;
+export const EMISSION_FACTORS = Object.freeze({
+  carKgPerKm: 0.21,
+  publicKgPerKm: 0.08,
+  electricityKgPerKwh: 0.417,
+  wasteKgPerKg: 0.57,
+  meatMealKgPerMeal: 2.5,
+  weeksPerMonth: 4.345,
+});
+```
+
+### Input Validation & Boundary Checks
+The `validateInput` function screens raw inputs. Rather than general type coercion, it explicitly checks boundaries (catching negative numbers, empty inputs, and values exceeding `MAX_VALUE` of `1,000,000`):
+
+```javascript
+export function validateInput(input) {
+  const errors = {};
+  const value = {};
+
+  for (const field of NUMERIC_FIELDS) {
+    const raw = input[field];
+    if (raw === undefined || raw === null || String(raw).trim() === "") {
+      errors[field] = "This field is required. Enter 0 if not applicable.";
+      continue;
+    }
+    const numericValue = Number(raw);
+    if (!Number.isFinite(numericValue)) {
+      errors[field] = "A valid number is required.";
+      ...
+```
+
+---
+
+## 📊 2. Dynamic SVG Donut Chart & Rotated Labels (`app.js`)
+
+Rather than pulling in massive charting packages, the dashboard draws segment arcs directly inside `drawDonutChart(components)` using the SVG stroke properties:
+
+1. Circumference: $C = 2 \pi r \approx 219.91$ (where radius $r = 35$).
+2. `stroke-dashoffset` controls the segment length:
+   ```javascript
+   const percent = value / total;
+   const strokeLength = percent * circ;
+   const strokeOffset = circ - strokeLength;
+   ```
+3. Because the container SVG `.donut-chart-svg` is rotated `-90deg` by CSS to align slices starting from 12 o'clock, text elements inside it would naturally render rotated. To keep the center label horizontal and readable, we offset the group by a positive `90deg` transform:
+   ```javascript
+   svgContent += `
+     <g class="chart-center-text" transform="rotate(90 50 50)">
+       <text x="50" y="52" text-anchor="middle" font-size="4.8" fill="var(--text-primary)" font-weight="800">
+         ${total.toFixed(0)} kg CO₂e/mo
+       </text>
+     </g>
+   `;
+   ```
+
+---
+
+## ♿ 3. Full Accessibility Integration (`app.js` & `index.html`)
+
+We strictly conform to WCAG 2.1 AA guidelines by managing user focus and ARIA attributes:
+
+### Tab Switching & Keyboard Navigation
+Inside `initTabs()`, key down listeners capture keyboard arrow keys to navigate dashboard tabs cleanly. If a user presses `ArrowRight`, the browser manages focus index and updates layout attributes:
+
+```javascript
+tabList.addEventListener("keydown", (e) => {
+  const activeTab = document.activeElement;
+  let index = tabsArr.indexOf(activeTab);
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+    index = (index + 1) % tabsArr.length;
+    tabsArr[index].focus();
+    tabsArr[index].click();
+    e.preventDefault();
+  }
+  ...
+```
+
+### Dynamic Error Announcements
+When a validation fails, `renderErrors(errors)` links input elements to error text blocks dynamically, prompting immediate reading by screen readers:
+
+```javascript
+input.setAttribute("aria-invalid", "true");
+input.setAttribute("aria-describedby", `${helpId} ${errorSpan.id}`.trim());
+```
+
+---
+
+## 🔒 4. Server-Side Security Measures (`server.js`)
+
+For production environments, the custom `server.js` protects the application from common hosting vulnerabilities without standard web framework bloat:
+
+### Directory Traversal Block
+URL normalizations make sure requested files sit strictly inside the working directory:
+```javascript
+const filePath = path.join(__dirname, safePath);
+const relativePath = path.relative(__dirname, filePath);
+
+if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+  res.statusCode = 403;
+  res.setHeader("Content-Type", "text/plain");
+  res.end("403 Forbidden: Access denied.");
+  return;
 }
 ```
 
-By offsetting the container rotation inside a `<g>` wrapper (`transform="rotate(90 50 50)"`), the center text aligns horizontally and reads cleanly, preventing rotated layouts.
+### Hardened Header Declarations
+Every response includes headers designed to block clickjacking, MIME sniffing, and cross-site scripting (XSS):
+```javascript
+res.setHeader("X-Content-Type-Options", "nosniff");
+res.setHeader("X-Frame-Options", "DENY");
+res.setHeader("X-XSS-Protection", "1; mode=block");
+res.setHeader("Content-Security-Policy", "default-src 'self'; font-src 'self' ...;");
+```
 
 ---
 
-## 🔒 3. Hardened Security & Custom Static Dev Server
+## 🤖 5. Context-Aware AI Chatbot (`app.js`)
 
-Public repositories are highly scrutinized for security. To protect our users and demonstrate top-tier safety compliance, I built a custom Node.js development server (`server.js`) equipped with:
+We built a local climate assistant (**EcoBot**) that operates without network requests. The bot parses queries using extensive keywords (e.g. `isBiggest`, `isTransport`, `isEnergy`) and generates calculations based on the user's active context:
 
-1. **Directory Traversal Mitigation**: Sanitizes and normalizes incoming file request URLs to block `../` path attacks, ensuring only files inside the project scope are accessible:
-   ```javascript
-   const filePath = path.join(__dirname, safePath);
-   const relativePath = path.relative(__dirname, filePath);
-   if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
-     res.statusCode = 403;
-     res.end("403 Forbidden");
-   }
-   ```
-2. **Hardened Security Headers**:
-   - **Content Security Policy (CSP)**: `default-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;` prevents arbitrary script execution.
-   - **X-Frame-Options (DENY)**: Completely blocks clickjacking.
-   - **X-Content-Type-Options (nosniff)**: Forces browsers to respect the sent MIME type.
-   - **X-XSS-Protection**: Prevents loading of pages when cross-site scripting attacks are detected.
+```javascript
+const maxEntry = Object.entries(currentFootprintComponents).reduce(
+  (max, entry) => entry[1] > max[1] ? entry : max, ["", -1]
+);
+const percentage = ((maxEntry[1] / currentFootprintValue) * 100).toFixed(0);
+
+return `Based on your inputs, your biggest source of carbon emissions is **${sourceNames[maxEntry[0]]}** producing **${maxEntry[1]} kg CO₂e/month** (representing **${percentage}%** of your total footprint).`;
+```
 
 ---
 
-## ♿ 4. Accessibility (a11y) & Interactive UX
+## 🧪 6. Testing Pipeline (`calculator.test.js`)
 
-EcoTrace is designed to be fully usable by individuals navigating with screen readers or keyboards.
+We run our tests using Node.js's native test runner (`node --test`), keeping verification fast and completely independent of third-party frameworks. Tests verify calculations, empty inputs, values exceeding boundaries, and recommendation sorting logic.
 
-- **WAI-ARIA Tab Navigation**: The dashboard implements standard keyboard tab switching. Pressing `ArrowRight` or `ArrowDown` focuses and opens subsequent tabs, keeping focus trapped correctly inside standard panels.
-- **Dynamic Field Associations**: When an input fails validation, we inject a detailed error label underneath, matching the parent container's `.has-error` style, and bind it using `aria-invalid="true"` and `aria-describedby="${field}-error"`. This triggers immediate screen reader announcements.
-- **Aria-Live Updates**: The calculation triggers an `aria-live="polite"` status message updating screen readers on their score and active categories.
-
----
-
-## 🤖 5. The EcoBot AI Assistant (Logical Decision Making)
-
-To elevate usability, I implemented **EcoBot**—an interactive chatbot that analyzes user data. EcoBot runs entirely on client-side logic using key phrase matching, removing any API latency or cost overhead.
-
-- If the user asks *"What is my biggest source?"*, the bot evaluates the maximum footprint component and replies: *"Electricity represents 61% of your total emissions..."*
-- If the user asks *"Suggest a goal"*, it calculates a custom 20% reduction target (e.g. *"I recommend target 136 kg/month"*).
-- Incorporates typing indicators to mimic realistic assistant interactions.
-
----
-
-## 🧪 6. Testing Strategy
-Using Node.js's built-in `node:test` framework, we have configured robust unit tests to verify:
-- Non-numeric input rejections.
-- Bound checking (inputs exceeding `1,000,000` or negative values).
-- Default values (empty entries are caught cleanly).
-- Precise carbon calculation coefficients.
-- Action savings evaluations.
-
-Run the test suite anytime:
 ```bash
+# Run the test suite
 npm test
 ```
 
@@ -113,4 +168,4 @@ npm test
 
 ## 💡 Summary
 
-EcoTrace represents a modern, highly secure, fast, and accessible approach to web engineering. By dropping massive libraries in favor of native DOM operations and custom SVG math, the platform remains blazing fast, easily deployable as a static asset, and entirely secure against supply-chain attacks.
+By dropping massive frameworks in favor of native APIs, custom SVG mathematics, and clean, accessible code patterns, **EcoTrace** remains blazing fast, highly secure, and extremely maintainable.
