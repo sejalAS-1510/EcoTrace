@@ -3,8 +3,16 @@
  * Contains validation, calculations, categories, and action planner logic.
  */
 
+/**
+ * Maximum allowable value for numeric input fields to prevent overflow.
+ * @type {number}
+ */
 export const MAX_VALUE = 1_000_000;
 
+/**
+ * Emission factors (in kg CO2e) and calendar constants.
+ * @type {Readonly<{carKgPerKm: number, publicKgPerKm: number, electricityKgPerKwh: number, wasteKgPerKg: number, meatMealKgPerMeal: number, weeksPerMonth: number}>}
+ */
 export const EMISSION_FACTORS = Object.freeze({
   carKgPerKm: 0.21,
   publicKgPerKm: 0.08,
@@ -14,6 +22,10 @@ export const EMISSION_FACTORS = Object.freeze({
   weeksPerMonth: 4.345,
 });
 
+/**
+ * List of expected numeric field names from the calculator form.
+ * @type {ReadonlyArray<string>}
+ */
 export const NUMERIC_FIELDS = Object.freeze([
   "carKmPerWeek",
   "publicKmPerWeek",
@@ -22,7 +34,10 @@ export const NUMERIC_FIELDS = Object.freeze([
   "meatMealsPerWeek",
 ]);
 
-// Benchmarks for comparison (in kg CO2e / month)
+/**
+ * Benchmarks for comparison (in kg CO2e / month)
+ * @type {Readonly<{GLOBAL_TARGET: number, WORLD_AVERAGE: number, US_AVERAGE: number}>}
+ */
 export const BENCHMARKS = Object.freeze({
   GLOBAL_TARGET: 150,     // UN climate target per person
   WORLD_AVERAGE: 400,     // Global average per person

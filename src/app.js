@@ -444,14 +444,12 @@ function renderActionChecklist(tipsDetails) {
   tipsDetails.forEach((tip) => {
     const item = document.createElement("div");
     item.className = "action-item";
-    item.setAttribute("role", "button");
-    item.setAttribute("tabindex", "0");
     item.setAttribute("data-id", tip.id);
     item.setAttribute("data-savings", tip.savings);
 
     item.innerHTML = `
       <div class="action-checkbox-container">
-        <input type="checkbox" id="chk-${tip.id}" tabIndex="-1" aria-hidden="true" />
+        <input type="checkbox" id="chk-${tip.id}" />
       </div>
       <div class="action-details">
         <div class="action-header-line">
@@ -463,25 +461,16 @@ function renderActionChecklist(tipsDetails) {
     `;
 
     const checkbox = item.querySelector("input");
-    const toggleChecked = () => {
-      checkbox.checked = !checkbox.checked;
+
+    checkbox.addEventListener("change", () => {
       item.classList.toggle("checked", checkbox.checked);
       updateProjectedSavings();
-    };
-
-    item.addEventListener("click", (e) => {
-      if (e.target.tagName !== "INPUT" && e.target.tagName !== "LABEL") {
-        toggleChecked();
-      } else if (e.target.tagName === "INPUT") {
-        item.classList.toggle("checked", checkbox.checked);
-        updateProjectedSavings();
-      }
     });
 
-    item.addEventListener("keydown", (e) => {
-      if (e.key === " " || e.key === "Enter") {
-        e.preventDefault();
-        toggleChecked();
+    item.addEventListener("click", (e) => {
+      // If the click is not directly on the input or label, toggle it via programmatically clicking the input
+      if (e.target !== checkbox && e.target.tagName !== "LABEL") {
+        checkbox.click();
       }
     });
 
