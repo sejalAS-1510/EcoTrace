@@ -824,4 +824,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (form) {
     form.addEventListener("submit", handleCalculatorSubmit);
   }
+
+  const gotoCalcBtn = document.querySelector("#btn-goto-calculator");
+  if (gotoCalcBtn) {
+    gotoCalcBtn.addEventListener("click", () => {
+      switchTab("tab-calculator");
+    });
+  }
 });

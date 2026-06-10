@@ -10,7 +10,7 @@ Every line of code in the repository was built to demonstrate clean engineering,
 
 The repository is structured logically to separate user interface, business logic, testing, and deployment configurations:
 
-- `index.html`: Holds the semantic layout, accessible WAI-ARIA tabs, calculator forms, and chat widgets.
+- `index.html`: Holds the semantic layout, Problem & Solution alignment view, accessible WAI-ARIA tabs, calculator forms, and chat widgets.
 - `styles.css`: Centralizes modern style tokens, layouts, transitions, and the Forest Dark & Fresh Light themes.
 - `server.js`: A secure, zero-dependency local static server.
 - `vercel.json`: Configuration for serverless static hosting and edge security rules.

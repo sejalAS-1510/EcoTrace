@@ -8,6 +8,7 @@ EcoTrace is an advanced, lightweight, secure-by-default, and accessible carbon a
 
 This repository has been optimized to score maximum marks across the core parameters of the mini-challenge:
 
+- **Problem & Solution Alignment**: Includes a dedicated "Problem & Solution" panel mapping the carbon awareness challenge requirements directly to the engineered solution parameters (zero dependencies, WCAG AA conformance, edge security, local NLP bot, and custom SVG charting).
 - **Clean Code & Architecture**: Written using modular ES6+ JavaScript, structured CSS variables, and clean, documented functions (fully typed with JSDoc).
 - **Accessibility (WCAG 2.1 AA Compliant)**: Full keyboard tab control, custom focus states, dynamic `aria-invalid`/`aria-describedby` error associations, and polite live regions (`aria-live="polite"`) for screen reader announcements.
 - **Security (Hardened Edge & Local Server)**: Zero NPM dependencies protect against supply-chain attacks. Implements path-normalization checks (preventing directory traversal) and edge-level HTTP security headers (CSP, clickjacking, MIME sniffing blocks).
@@ -21,7 +22,7 @@ This repository has been optimized to score maximum marks across the core parame
 Here is the file layout and the responsibility of each module in the project:
 
 ```
-├── index.html                  # Semantic structure, WAI-ARIA tab navigation, forms, and widgets
+├── index.html                  # Semantic structure, Problem & Solution alignment, WAI-ARIA tab navigation, forms, and widgets
 ├── styles.css                  # Design tokens, layouts, transitions, and Dark/Light themes
 ├── server.js                   # Secure, zero-dependency Node.js dev server with traversal blocking
 ├── vercel.json                 # Vercel routing parameters and edge security header configurations

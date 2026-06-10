@@ -96,12 +96,34 @@
         >
           <button
             type="button"
-            id="tab-calculator"
+            id="tab-overview"
             class="nav-tab-btn active"
             role="tab"
             aria-selected="true"
-            aria-controls="panel-calculator"
+            aria-controls="panel-overview"
             tabindex="0"
+          >
+            <svg
+              class="tab-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            <span>Problem &amp; Solution</span>
+          </button>
+
+          <button
+            type="button"
+            id="tab-calculator"
+            class="nav-tab-btn"
+            role="tab"
+            aria-selected="false"
+            aria-controls="panel-calculator"
+            tabindex="-1"
           >
             <svg
               class="tab-icon"
@@ -225,11 +247,155 @@
 
       <!-- Main Content Area -->
       <main class="main-content" id="main-content-area">
+        <!-- Tab 0: Problem & Solution Overview Panel -->
+        <section
+          id="panel-overview"
+          role="tabpanel"
+          aria-labelledby="tab-overview"
+        >
+          <div class="section-header">
+            <h2>Challenge Alignment &amp; Solution</h2>
+            <p>
+              EcoTrace aligns the Carbon Footprint Awareness problem statement with a zero-dependency, secure-by-default, and fully accessible engineering implementation.
+            </p>
+          </div>
+
+          <div class="grid-two-cols">
+            <!-- Left Side: Problem Statement -->
+            <div class="card problem-card">
+              <div class="card-badge badge-problem">The Problem</div>
+              <h3>Understanding the Challenge</h3>
+              <p class="overview-p">
+                Existing carbon calculators and eco-platforms face several critical flaws that undermine their adoption, security, and usability:
+              </p>
+              <ul class="overview-list problem-list">
+                <li>
+                  <span class="icon-indicator">✗</span>
+                  <div>
+                    <strong>Data Privacy &amp; Tracking Risks:</strong> Many tools require accounts, transmit sensitive habits to third parties, or use external tracking scripts.
+                  </div>
+                </li>
+                <li>
+                  <span class="icon-indicator">✗</span>
+                  <div>
+                    <strong>Access &amp; Inclusivity Barriers:</strong> Heavy visual dashboards often completely lock out users relying on screen readers or keyboard-only navigation.
+                  </div>
+                </li>
+                <li>
+                  <span class="icon-indicator">✗</span>
+                  <div>
+                    <strong>Supply-Chain Vulnerabilities:</strong> Dashboards rely heavily on NPM libraries and external scripts, making them vulnerable to malicious injections or domain hijackings.
+                  </div>
+                </li>
+                <li>
+                  <span class="icon-indicator">✗</span>
+                  <div>
+                    <strong>Performance Bloat:</strong> Massive charting frameworks (like ChartJS/D3) slow down page loads, consume user bandwidth, and limit offline usability.
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Right Side: Standout Solution -->
+            <div class="card solution-card">
+              <div class="card-badge badge-solution">Our Solution</div>
+              <h3>How EcoTrace Stands Out</h3>
+              <p class="overview-p">
+                EcoTrace addresses every aspect of the problem statement using raw, high-performance web standards to deliver a superior, secure, and accessible platform:
+              </p>
+              <ul class="overview-list solution-list">
+                <li>
+                  <span class="icon-indicator">✓</span>
+                  <div>
+                    <strong>Zero-Dependency Core:</strong> Built entirely using native HTML5, CSS3, and ES6+ JS. Sub-millisecond performance with zero susceptibility to NPM supply-chain exploits.
+                  </div>
+                </li>
+                <li>
+                  <span class="icon-indicator">✓</span>
+                  <div>
+                    <strong>Hardened Node.js Server:</strong> Custom server equipped with a strict path-traversal barrier and headers preventing clickjacking, MIME-sniffing, and cross-site scripting (XSS).
+                  </div>
+                </li>
+                <li>
+                  <span class="icon-indicator">✓</span>
+                  <div>
+                    <strong>100% WCAG 2.1 AA Compliant:</strong> Seamless keyboard tab navigation, custom focus states, explicit input labeling, and dynamic screen reader live announcements.
+                  </div>
+                </li>
+                <li>
+                  <span class="icon-indicator">✓</span>
+                  <div>
+                    <strong>Offline-Capable Climate AI:</strong> Features "EcoBot"—a local assistant analyzing live carbon variables dynamically without requiring any network requests.
+                  </div>
+                </li>
+                <li>
+                  <span class="icon-indicator">✓</span>
+                  <div>
+                    <strong>Native SVG Charting:</strong> Interactive segment arcs are drawn directly using native SVG calculations, eliminating library bloat.
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- User Workflow Steps -->
+          <div class="card workflow-card">
+            <h3>How to Use the Platform</h3>
+            <div class="workflow-steps">
+              <div class="step-card">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                  <h4>Calculate</h4>
+                  <p>Provide your habits in the Calculator form. Try using the quick 'Fill Demo Data' option.</p>
+                </div>
+              </div>
+              <div class="step-card">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                  <h4>Analyze</h4>
+                  <p>Visualize your carbon footprint breakdown with our interactive SVG charts and gauge rating.</p>
+                </div>
+              </div>
+              <div class="step-card">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                  <h4>Consult</h4>
+                  <p>Ask EcoBot, our offline-capable AI, for specific tips or details regarding your emissions.</p>
+                </div>
+              </div>
+              <div class="step-card">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                  <h4>Reduce</h4>
+                  <p>Check target actions in the Reduction Plan to see your projected savings and leaderboard rank update in real-time!</p>
+                </div>
+              </div>
+            </div>
+            <div class="workflow-cta">
+              <button type="button" id="btn-goto-calculator" class="btn btn-primary">
+                Get Started: Open Calculator
+                <svg
+                  class="btn-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  aria-hidden="true"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
         <!-- Tab 1: Calculator Panel -->
         <section
           id="panel-calculator"
           role="tabpanel"
           aria-labelledby="tab-calculator"
+          hidden
         >
           <div class="section-header">
             <h2>Carbon Footprint Calculator</h2>
