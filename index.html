@@ -36,11 +36,12 @@
             />
             <path d="M12 2V19" />
           </svg>
-          <span class="logo-text">EcoTrace</span>
+          <h1 class="logo-text">EcoTrace</h1>
         </div>
 
         <div class="header-actions">
           <button
+            type="button"
             id="theme-toggle"
             class="theme-btn"
             aria-label="Toggle light and dark mode"
@@ -94,6 +95,7 @@
           aria-label="Eco Dashboard Sections"
         >
           <button
+            type="button"
             id="tab-calculator"
             class="nav-tab-btn active"
             role="tab"
@@ -118,6 +120,7 @@
           </button>
 
           <button
+            type="button"
             id="tab-insights"
             class="nav-tab-btn"
             role="tab"
@@ -141,6 +144,7 @@
           </button>
 
           <button
+            type="button"
             id="tab-assistant"
             class="nav-tab-btn"
             role="tab"
@@ -164,6 +168,7 @@
           </button>
 
           <button
+            type="button"
             id="tab-planner"
             class="nav-tab-btn"
             role="tab"
@@ -187,6 +192,7 @@
           </button>
 
           <button
+            type="button"
             id="tab-benchmarks"
             class="nav-tab-btn"
             role="tab"
@@ -226,7 +232,7 @@
           aria-labelledby="tab-calculator"
         >
           <div class="section-header">
-            <h1>Carbon Footprint Calculator</h1>
+            <h2>Carbon Footprint Calculator</h2>
             <p>
               Estimate your monthly carbon emissions by providing details about
               your weekly and monthly consumption habits.
@@ -465,7 +471,7 @@
           hidden
         >
           <div class="section-header">
-            <h1>Impact Insights</h1>
+            <h2>Impact Insights</h2>
             <p>
               A breakdown of your monthly carbon emissions and category rating.
             </p>
@@ -474,7 +480,7 @@
           <div class="dashboard-grid">
             <!-- Left Side: Big Number and Gauge -->
             <div class="card insights-score-card">
-              <h2>Your Emission Rating</h2>
+              <h3>Your Emission Rating</h3>
               <div class="score-display">
                 <span id="results-value" class="score-num">0</span>
                 <span class="score-unit">kg CO₂e/month</span>
@@ -509,7 +515,7 @@
 
             <!-- Right Side: SVG Chart -->
             <div class="card chart-card">
-              <h2>Emission Breakdown</h2>
+              <h3>Emission Breakdown</h3>
               <div class="chart-container">
                 <svg
                   id="donut-chart"
@@ -573,7 +579,7 @@
           hidden
         >
           <div class="section-header">
-            <h1>Eco Assistant</h1>
+            <h2>Eco Assistant</h2>
             <p>
               Your dynamic context-aware AI helper. Ask questions about your
               carbon footprint or get tailored advice.
@@ -600,7 +606,7 @@
                 <span class="online-indicator"></span>
               </div>
               <div class="assistant-details">
-                <h2 class="assistant-name">EcoBot</h2>
+                <h3 class="assistant-name">EcoBot</h3>
                 <p class="assistant-sub">Interactive Climate Advisor</p>
               </div>
             </div>
@@ -618,16 +624,16 @@
 
             <!-- Suggestion Chips -->
             <div class="chat-suggestions" id="chat-suggestions">
-              <button class="chip" data-query="biggest-source">
+              <button type="button" class="chip" data-query="biggest-source">
                 What's my biggest emission source?
               </button>
-              <button class="chip" data-query="transport-advice">
+              <button type="button" class="chip" data-query="transport-advice">
                 How can I cut transport footprint?
               </button>
-              <button class="chip" data-query="target-goal">
+              <button type="button" class="chip" data-query="target-goal">
                 Suggest a reduction target
               </button>
-              <button class="chip" data-query="general-tips">
+              <button type="button" class="chip" data-query="general-tips">
                 General eco tips
               </button>
             </div>
@@ -669,7 +675,7 @@
           hidden
         >
           <div class="section-header">
-            <h1>My Climate Action Plan</h1>
+            <h2>My Climate Action Plan</h2>
             <p>
               Select actions below to see your potential footprint reduction in
               real-time. Committing to these habits lowers your projected
@@ -680,7 +686,7 @@
           <div class="planner-grid">
             <!-- Checklist Card -->
             <div class="card planner-checklist-card">
-              <h2>Tailored Carbon Reduction Actions</h2>
+              <h3>Tailored Carbon Reduction Actions</h3>
               <p class="planner-helper-text">
                 Select habits you want to adopt to reduce your footprint.
               </p>
@@ -699,7 +705,7 @@
 
             <!-- Goal Tracker Card -->
             <div class="card planner-goal-card">
-              <h2>Savings Impact Tracker</h2>
+              <h3>Savings Impact Tracker</h3>
 
               <div class="planner-comparison">
                 <div class="footprint-pill current">
@@ -754,7 +760,7 @@
           hidden
         >
           <div class="section-header">
-            <h1>Global Comparisons</h1>
+            <h2>Global Comparisons</h2>
             <p>
               See how your monthly emissions stack up against regional averages
               and climate stabilization goals.
@@ -762,7 +768,7 @@
           </div>
 
           <div class="card">
-            <h2>Where You Stand</h2>
+            <h3>Where You Stand</h3>
             <div class="benchmarks-visual">
               <!-- User emissions -->
               <div class="benchmark-row user-row">
@@ -828,7 +834,7 @@
 
           <div class="grid-two-cols">
             <div class="card">
-              <h3>Understanding Your Impact</h3>
+              <h4>Understanding Your Impact</h4>
               <p>
                 Every activity creates carbon dioxide and other greenhouse
                 gases. Estimating your footprint makes it clear where carbon
@@ -854,7 +860,7 @@
             </div>
 
             <div class="card">
-              <h3>The Leaderboard Challenge</h3>
+              <h4>The Leaderboard Challenge</h4>
               <p>
                 Join the movement! Our global leaderboard ranks users based on
                 their active carbon reduction potential. Adopt cleaner habits,
