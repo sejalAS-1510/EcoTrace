@@ -47,9 +47,10 @@ const server = http.createServer((req, res) => {
   res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
   res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+  res.setHeader("Permissions-Policy", "unload=*");
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; script-src 'self'; img-src 'self' data:; connect-src 'self';"
+    "default-src 'self'; font-src 'self' https://fonts.gstatic.com data:; style-src 'self' https://fonts.googleapis.com; script-src 'self'; img-src 'self' data:; connect-src 'self';"
   );
 
   // Parse and normalize file path
@@ -64,6 +65,12 @@ const server = http.createServer((req, res) => {
   }
 
   let safePath = parsedUrl.pathname;
+  if (safePath === "/favicon.ico") {
+    res.statusCode = 204; // 204 No Content (clears favicon 404 console warnings)
+    res.end();
+    return;
+  }
+
   if (safePath === "/") {
     safePath = "/index.html";
   }
