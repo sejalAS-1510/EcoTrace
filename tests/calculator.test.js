@@ -7,6 +7,7 @@ import {
   getReductionTips,
   validateInput,
   getTipsDetails,
+  roundToTwo,
   MAX_VALUE,
   EMISSION_FACTORS,
 } from "../src/calculator.js";
@@ -219,4 +220,42 @@ test("getTipsDetails handles zero inputs and small meat meals counts correctly",
   // Food savings: Math.min(3, 2) * 2.5 * 4.345 = 2 * 2.5 * 4.345 = 21.725 -> rounded to 21.73
   assert.equal(foodTip.savings, 21.73);
 });
+
+test("roundToTwo rounds values correctly including floats", () => {
+  assert.equal(roundToTwo(1.234), 1.23);
+  assert.equal(roundToTwo(1.236), 1.24);
+  assert.equal(roundToTwo(1.005), 1.01);
+  assert.equal(roundToTwo(-1.234), -1.23);
+  assert.equal(roundToTwo(0), 0);
+});
+
+test("validateInput boundary limits check", () => {
+  const resultZero = validateInput({
+    carKmPerWeek: 0,
+    publicKmPerWeek: "0",
+    electricityKwhPerMonth: 0,
+    wasteKgPerWeek: "0",
+    meatMealsPerWeek: 0,
+  });
+  assert.equal(resultZero.valid, true);
+  assert.equal(resultZero.value.carKmPerWeek, 0);
+
+  const resultMax = validateInput({
+    carKmPerWeek: MAX_VALUE,
+    publicKmPerWeek: MAX_VALUE,
+    electricityKwhPerMonth: MAX_VALUE,
+    wasteKgPerWeek: MAX_VALUE,
+    meatMealsPerWeek: MAX_VALUE,
+  });
+  assert.equal(resultMax.valid, true);
+  assert.equal(resultMax.value.carKmPerWeek, MAX_VALUE);
+});
+
+test("categorizeFootprint category boundaries check", () => {
+  assert.equal(categorizeFootprint(299.99), "Low");
+  assert.equal(categorizeFootprint(300), "Moderate");
+  assert.equal(categorizeFootprint(699.99), "Moderate");
+  assert.equal(categorizeFootprint(700), "High");
+});
+
 

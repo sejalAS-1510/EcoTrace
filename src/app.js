@@ -18,19 +18,139 @@ let currentFootprintValue = 0;
 let currentFootprintComponents = null;
 let currentValidatedInput = null;
 
-const legendIds = {
-  car: "#legend-car",
-  publicTransport: "#legend-transit",
-  electricity: "#legend-electricity",
-  waste: "#legend-waste",
-  food: "#legend-food",
+// DOM Element Cache for High-Performance Queries (Efficiency enhancement)
+const DOM = {
+  themeToggle: null,
+  tabList: null,
+  errorBanner: null,
+  donutChart: null,
+  gaugePin: null,
+  benchUserBar: null,
+  benchUserVal: null,
+  resultsValue: null,
+  resultsCategoryBadge: null,
+  resultsSummary: null,
+  plannerSavingsVal: null,
+  plannerProjectedVal: null,
+  plannerReductionPct: null,
+  plannerProgressFill: null,
+  reductionMilestoneText: null,
+  leaderboardRank: null,
+  leaderboardScore: null,
+  sidebarFootprint: null,
+  plannerChecklist: null,
+  tipsList: null,
+  chatForm: null,
+  chatInput: null,
+  chatMessages: null,
+  chatSuggestions: null,
+  gotoCalcBtn: null,
+  footprintForm: null,
+  btnDemo: null,
+  resultsAnnouncer: null,
+  
+  // Inputs
+  inputCar: null,
+  inputTransit: null,
+  inputElectricity: null,
+  inputWaste: null,
+  inputFood: null,
+
+  // Legends
+  legendCar: null,
+  legendTransit: null,
+  legendElectricity: null,
+  legendWaste: null,
+  legendFood: null,
+
+  // Node Collections (Cached as Arrays)
+  tabs: [],
+  panels: [],
+  formGroups: [],
 };
+
+/**
+ * Initializes the DOM element cache.
+ */
+function initDOMCache() {
+  DOM.themeToggle = document.querySelector("#theme-toggle");
+  DOM.tabList = document.querySelector('[role="tablist"]');
+  DOM.errorBanner = document.querySelector("#errors");
+  DOM.donutChart = document.querySelector("#donut-chart");
+  DOM.gaugePin = document.querySelector("#gauge-pin");
+  DOM.benchUserBar = document.querySelector("#bench-user-bar");
+  DOM.benchUserVal = document.querySelector("#bench-user-val");
+  DOM.resultsValue = document.querySelector("#results-value");
+  DOM.resultsCategoryBadge = document.querySelector("#results-category-badge");
+  DOM.resultsSummary = document.querySelector("#summary");
+  DOM.plannerSavingsVal = document.querySelector("#planner-savings-val");
+  DOM.plannerProjectedVal = document.querySelector("#planner-projected-val");
+  DOM.plannerReductionPct = document.querySelector("#planner-reduction-pct");
+  DOM.plannerProgressFill = document.querySelector("#planner-progress-fill");
+  DOM.reductionMilestoneText = document.querySelector("#reduction-milestone-text");
+  DOM.leaderboardRank = document.querySelector("#leaderboard-rank");
+  DOM.leaderboardScore = document.querySelector("#leaderboard-score");
+  DOM.sidebarFootprint = document.querySelector("#sidebar-footprint");
+  DOM.plannerChecklist = document.querySelector("#planner-checklist");
+  DOM.tipsList = document.querySelector("#tips");
+  DOM.chatForm = document.querySelector("#chat-form");
+  DOM.chatInput = document.querySelector("#chat-input");
+  DOM.chatMessages = document.querySelector("#chat-messages");
+  DOM.chatSuggestions = document.querySelector("#chat-suggestions");
+  DOM.gotoCalcBtn = document.querySelector("#btn-goto-calculator");
+  DOM.footprintForm = document.querySelector("#footprint-form");
+  DOM.btnDemo = document.querySelector("#btn-demo");
+  DOM.resultsAnnouncer = document.querySelector("#results");
+
+  // Inputs
+  DOM.inputCar = document.querySelector("#carKmPerWeek");
+  DOM.inputTransit = document.querySelector("#publicKmPerWeek");
+  DOM.inputElectricity = document.querySelector("#electricityKwhPerMonth");
+  DOM.inputWaste = document.querySelector("#wasteKgPerWeek");
+  DOM.inputFood = document.querySelector("#meatMealsPerWeek");
+
+  // Legends
+  DOM.legendCar = document.querySelector("#legend-car");
+  DOM.legendTransit = document.querySelector("#legend-transit");
+  DOM.legendElectricity = document.querySelector("#legend-electricity");
+  DOM.legendWaste = document.querySelector("#legend-waste");
+  DOM.legendFood = document.querySelector("#legend-food");
+
+  // Collections
+  DOM.tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+  DOM.panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+  DOM.formGroups = Array.from(document.querySelectorAll(".form-group"));
+}
+
+/**
+ * Safely escapes HTML special characters to prevent Cross-Site Scripting (XSS).
+ * @param {string} str
+ * @returns {string} Escaped string
+ */
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
+ * Parses bold markdown and converts to safe HTML.
+ * @param {string} str
+ * @returns {string} Formatted safe HTML
+ */
+function formatMarkdown(str) {
+  const escaped = escapeHTML(str);
+  return escaped.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+}
 
 /**
  * Initializes light/dark theme toggle based on system and saved preferences.
  */
 function initTheme() {
-  const themeToggle = document.querySelector("#theme-toggle");
+  const themeToggle = DOM.themeToggle;
   if (!themeToggle) return;
 
   const savedTheme = localStorage.getItem("theme");
@@ -53,19 +173,16 @@ function initTheme() {
  * @param {string} tabId - ID of the clicked tab.
  */
 function switchTab(tabId) {
-  const targetTab = document.getElementById(tabId);
+  const targetTab = DOM.tabs.find((t) => t.id === tabId);
   if (!targetTab) return;
   
-  const tabs = document.querySelectorAll('[role="tab"]');
-  const panels = document.querySelectorAll('[role="tabpanel"]');
-  
-  tabs.forEach((t) => {
+  DOM.tabs.forEach((t) => {
     t.setAttribute("aria-selected", "false");
     t.setAttribute("tabindex", "-1");
     t.classList.remove("active");
   });
   
-  panels.forEach((p) => {
+  DOM.panels.forEach((p) => {
     p.setAttribute("hidden", "true");
   });
   
@@ -74,7 +191,7 @@ function switchTab(tabId) {
   targetTab.classList.add("active");
   
   const panelId = targetTab.getAttribute("aria-controls");
-  const panel = document.getElementById(panelId);
+  const panel = DOM.panels.find((p) => p.id === panelId);
   if (panel) {
     panel.removeAttribute("hidden");
     panel.setAttribute("tabindex", "-1");
@@ -86,31 +203,28 @@ function switchTab(tabId) {
  * Attaches click and key events for accessible tab switching.
  */
 function initTabs() {
-  const tabs = document.querySelectorAll('[role="tab"]');
-  
-  tabs.forEach((tab) => {
+  DOM.tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
       switchTab(tab.id);
     });
   });
 
-  const tabList = document.querySelector('[role="tablist"]');
+  const tabList = DOM.tabList;
   if (tabList) {
-    const tabsArr = Array.from(tabs);
     tabList.addEventListener("keydown", (e) => {
       const activeTab = document.activeElement;
-      if (!tabsArr.includes(activeTab)) return;
+      if (!DOM.tabs.includes(activeTab)) return;
       
-      let index = tabsArr.indexOf(activeTab);
+      let index = DOM.tabs.indexOf(activeTab);
       if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-        index = (index + 1) % tabsArr.length;
-        tabsArr[index].focus();
-        tabsArr[index].click();
+        index = (index + 1) % DOM.tabs.length;
+        DOM.tabs[index].focus();
+        DOM.tabs[index].click();
         e.preventDefault();
       } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-        index = (index - 1 + tabsArr.length) % tabsArr.length;
-        tabsArr[index].focus();
-        tabsArr[index].click();
+        index = (index - 1 + DOM.tabs.length) % DOM.tabs.length;
+        DOM.tabs[index].focus();
+        DOM.tabs[index].click();
         e.preventDefault();
       }
     });
@@ -121,14 +235,13 @@ function initTabs() {
  * Clears previous form validation errors.
  */
 function clearErrors() {
-  const errorBanner = document.querySelector("#errors");
+  const errorBanner = DOM.errorBanner;
   if (errorBanner) {
     errorBanner.style.display = "none";
     errorBanner.textContent = "";
   }
 
-  const groups = document.querySelectorAll(".form-group");
-  groups.forEach((group) => {
+  DOM.formGroups.forEach((group) => {
     group.classList.remove("has-error");
     const existingError = group.querySelector(".field-error-msg");
     if (existingError) {
@@ -153,11 +266,19 @@ function clearErrors() {
 function renderErrors(errors) {
   clearErrors();
 
-  const errorBanner = document.querySelector("#errors");
+  const errorBanner = DOM.errorBanner;
   const errorList = document.createElement("ul");
 
+  const inputElements = {
+    carKmPerWeek: DOM.inputCar,
+    publicKmPerWeek: DOM.inputTransit,
+    electricityKwhPerMonth: DOM.inputElectricity,
+    wasteKgPerWeek: DOM.inputWaste,
+    meatMealsPerWeek: DOM.inputFood,
+  };
+
   for (const [field, message] of Object.entries(errors)) {
-    const input = document.getElementById(field);
+    const input = inputElements[field];
     if (input) {
       const group = input.closest(".form-group");
       if (group) {
@@ -197,7 +318,7 @@ function renderErrors(errors) {
  * @param {Record<string, number>} components
  */
 function drawDonutChart(components) {
-  const chartSvg = document.querySelector("#donut-chart");
+  const chartSvg = DOM.donutChart;
   if (!chartSvg) return;
   
   chartSvg.innerHTML = "";
@@ -242,6 +363,10 @@ function drawDonutChart(components) {
     const strokeOffset = circ - strokeLength;
     const rotation = accumulatedPercent * 360 - 90; // Align top start (-90deg)
     
+    const escapedLabel = escapeHTML(labels[key]);
+    const escapedValue = escapeHTML(value.toFixed(1));
+    const escapedPercent = escapeHTML((percent * 100).toFixed(1));
+
     svgContent += `
       <circle 
         cx="50" 
@@ -256,9 +381,9 @@ function drawDonutChart(components) {
         class="chart-slice"
         tabindex="0"
         role="img"
-        aria-label="${labels[key]}: ${value.toFixed(0)} kg CO₂e (${(percent * 100).toFixed(0)}%)"
+        aria-label="${escapedLabel}: ${escapedValue} kg CO₂e (${escapedPercent}%)"
       >
-        <title>${labels[key]}: ${value.toFixed(1)} kg (${(percent * 100).toFixed(1)}%)</title>
+        <title>${escapedLabel}: ${escapedValue} kg (${escapedPercent}%)</title>
       </circle>
     `;
     accumulatedPercent += percent;
@@ -266,7 +391,7 @@ function drawDonutChart(components) {
   
   svgContent += `
     <g class="chart-center-text" transform="rotate(90 50 50)">
-      <text x="50" y="52" text-anchor="middle" font-size="4.8" fill="var(--text-primary)" font-weight="800">${total.toFixed(0)} kg CO₂e/mo</text>
+      <text x="50" y="52" text-anchor="middle" font-size="4.8" fill="var(--text-primary)" font-weight="800">${escapeHTML(total.toFixed(0))} kg CO₂e/mo</text>
     </g>
   `;
 
@@ -278,7 +403,7 @@ function drawDonutChart(components) {
  * @param {number} total
  */
 function updateGauge(total) {
-  const pin = document.querySelector("#gauge-pin");
+  const pin = DOM.gaugePin;
   if (!pin) return;
   
   let percent = 0;
@@ -298,8 +423,8 @@ function updateGauge(total) {
  * @param {number} total
  */
 function updateBenchmarks(total) {
-  const userBar = document.querySelector("#bench-user-bar");
-  const userVal = document.querySelector("#bench-user-val");
+  const userBar = DOM.benchUserBar;
+  const userVal = DOM.benchUserVal;
   
   if (userVal) userVal.textContent = `${total.toLocaleString()} kg CO₂e`;
   if (userBar) {
@@ -314,9 +439,9 @@ function updateBenchmarks(total) {
  * @param {string} category
  */
 function renderInsightsOutput(totalKgCo2ePerMonth, category) {
-  const valueEl = document.querySelector("#results-value");
-  const badgeEl = document.querySelector("#results-category-badge");
-  const summaryEl = document.querySelector("#summary");
+  const valueEl = DOM.resultsValue;
+  const badgeEl = DOM.resultsCategoryBadge;
+  const summaryEl = DOM.resultsSummary;
   
   if (valueEl) valueEl.textContent = totalKgCo2ePerMonth.toLocaleString();
   if (badgeEl) {
@@ -341,7 +466,7 @@ function renderInsightsOutput(totalKgCo2ePerMonth, category) {
  * Re-calculates projected footprint reductions when items are checked.
  */
 function updateProjectedSavings() {
-  const checkboxes = document.querySelectorAll("#planner-checklist input[type='checkbox']");
+  const checkboxes = DOM.plannerChecklist.querySelectorAll("input[type='checkbox']");
   let totalSavings = 0;
   
   checkboxes.forEach((chk) => {
@@ -360,10 +485,10 @@ function updateProjectedSavings() {
   const percentReduction = currentFootprintValue > 0 ? ((totalSavings / currentFootprintValue) * 100).toFixed(0) : 0;
   
   // Update UI Elements
-  const savingsVal = document.querySelector("#planner-savings-val");
-  const projectedVal = document.querySelector("#planner-projected-val");
-  const reductionPct = document.querySelector("#planner-reduction-pct");
-  const progressFill = document.querySelector("#planner-progress-fill");
+  const savingsVal = DOM.plannerSavingsVal;
+  const projectedVal = DOM.plannerProjectedVal;
+  const reductionPct = DOM.plannerReductionPct;
+  const progressFill = DOM.plannerProgressFill;
   
   if (savingsVal) savingsVal.textContent = `${savingsFormatted} kg`;
   if (projectedVal) projectedVal.textContent = `${projectedFormatted} kg`;
@@ -371,7 +496,7 @@ function updateProjectedSavings() {
   if (progressFill) progressFill.style.width = `${percentReduction}%`;
 
   // Milestone Alert Card
-  const milestoneText = document.querySelector("#reduction-milestone-text");
+  const milestoneText = DOM.reductionMilestoneText;
   if (milestoneText) {
     if (Number(percentReduction) === 0) {
       milestoneText.textContent = "Start checking actions to see your potential carbon savings grow!";
@@ -389,9 +514,9 @@ function updateProjectedSavings() {
   }
 
   // Update Leaderboard ranking
-  const rankEl = document.querySelector("#leaderboard-rank");
-  const scoreEl = document.querySelector("#leaderboard-score");
-  const sidebarFootprint = document.querySelector("#sidebar-footprint");
+  const rankEl = DOM.leaderboardRank;
+  const scoreEl = DOM.leaderboardScore;
+  const sidebarFootprint = DOM.sidebarFootprint;
 
   if (scoreEl) scoreEl.textContent = `${projectedFootprint.toFixed(0)} kg`;
   if (sidebarFootprint) sidebarFootprint.textContent = `${projectedFootprint.toFixed(0)} kg`;
@@ -417,8 +542,8 @@ function updateProjectedSavings() {
  * @param {Array<Object>} tipsDetails
  */
 function renderActionChecklist(tipsDetails) {
-  const checklistContainer = document.querySelector("#planner-checklist");
-  const legacyTipsList = document.querySelector("#tips");
+  const checklistContainer = DOM.plannerChecklist;
+  const legacyTipsList = DOM.tipsList;
   
   if (!checklistContainer) return;
 
@@ -447,16 +572,21 @@ function renderActionChecklist(tipsDetails) {
     item.setAttribute("data-id", tip.id);
     item.setAttribute("data-savings", tip.savings);
 
+    const escapedId = escapeHTML(tip.id);
+    const escapedTitle = escapeHTML(tip.title);
+    const escapedSavings = escapeHTML(tip.savings);
+    const escapedDesc = escapeHTML(tip.description);
+
     item.innerHTML = `
       <div class="action-checkbox-container">
-        <input type="checkbox" id="chk-${tip.id}" />
+        <input type="checkbox" id="chk-${escapedId}" />
       </div>
       <div class="action-details">
         <div class="action-header-line">
-          <label for="chk-${tip.id}" class="action-title">${tip.title}</label>
-          <span class="action-savings-tag">-${tip.savings} kg/mo</span>
+          <label for="chk-${escapedId}" class="action-title">${escapedTitle}</label>
+          <span class="action-savings-tag">-${escapedSavings} kg/mo</span>
         </div>
-        <p class="action-desc">${tip.description}</p>
+        <p class="action-desc">${escapedDesc}</p>
       </div>
     `;
 
@@ -468,7 +598,6 @@ function renderActionChecklist(tipsDetails) {
     });
 
     item.addEventListener("click", (e) => {
-      // If the click is not directly on the input or label, toggle it via programmatically clicking the input
       if (e.target !== checkbox && e.target.tagName !== "LABEL") {
         checkbox.click();
       }
@@ -513,10 +642,16 @@ function handleCalculatorSubmit(event) {
   renderActionChecklist(tipsDetails);
   updateProjectedSavings();
 
-  for (const [key, elementId] of Object.entries(legendIds)) {
-    const el = document.querySelector(elementId);
+  const legendElements = {
+    car: DOM.legendCar,
+    publicTransport: DOM.legendTransit,
+    electricity: DOM.legendElectricity,
+    waste: DOM.legendWaste,
+    food: DOM.legendFood,
+  };
+
+  for (const [key, el] of Object.entries(legendElements)) {
     if (!el) continue;
-    
     const val = result.components[key] || 0;
     const pct = result.totalKgCo2ePerMonth > 0 ? ((val / result.totalKgCo2ePerMonth) * 100).toFixed(0) : 0;
     el.textContent = `${pct}% (${val.toFixed(0)} kg)`;
@@ -525,9 +660,9 @@ function handleCalculatorSubmit(event) {
   switchTab("tab-insights");
 
   const announceMsg = `Footprint successfully calculated: ${result.totalKgCo2ePerMonth} kg CO2e per month, rating is ${category}. Tab switched to Impact Insights.`;
-  const announceArea = document.querySelector("#results");
+  const announceArea = DOM.resultsAnnouncer;
   if (announceArea) {
-    announceArea.setAttribute("aria-label", announceMsg);
+    announceArea.textContent = announceMsg;
   }
 }
 
@@ -535,8 +670,8 @@ function handleCalculatorSubmit(event) {
  * Sets up demo data listener.
  */
 function initDemoLoader() {
-  const btnDemo = document.querySelector("#btn-demo");
-  const form = document.querySelector("#footprint-form");
+  const btnDemo = DOM.btnDemo;
+  const form = DOM.footprintForm;
   
   if (!btnDemo || !form) return;
 
@@ -549,8 +684,16 @@ function initDemoLoader() {
       meatMealsPerWeek: "8",
     };
 
+    const demoInputs = {
+      carKmPerWeek: DOM.inputCar,
+      publicKmPerWeek: DOM.inputTransit,
+      electricityKwhPerMonth: DOM.inputElectricity,
+      wasteKgPerWeek: DOM.inputWaste,
+      meatMealsPerWeek: DOM.inputFood,
+    };
+
     for (const [key, value] of Object.entries(demoData)) {
-      const input = document.getElementById(key);
+      const input = demoInputs[key];
       if (input) {
         input.value = value;
       }
@@ -745,10 +888,10 @@ function generateAssistantResponse(userQuery) {
  * Initializes and wires up the chatbot EcoBot.
  */
 function initAssistant() {
-  const chatForm = document.querySelector("#chat-form");
-  const chatInput = document.querySelector("#chat-input");
-  const chatMessages = document.querySelector("#chat-messages");
-  const suggestionContainer = document.querySelector("#chat-suggestions");
+  const chatForm = DOM.chatForm;
+  const chatInput = DOM.chatInput;
+  const chatMessages = DOM.chatMessages;
+  const suggestionContainer = DOM.chatSuggestions;
 
   if (!chatForm || !chatInput || !chatMessages) return;
 
@@ -756,7 +899,8 @@ function initAssistant() {
   const appendMessage = (sender, text) => {
     const messageDiv = document.createElement("div");
     messageDiv.className = `message ${sender}`;
-    messageDiv.innerHTML = `<div class="message-bubble">${text}</div>`;
+    const safeContent = formatMarkdown(text);
+    messageDiv.innerHTML = `<div class="message-bubble">${safeContent}</div>`;
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     return messageDiv;
@@ -815,17 +959,18 @@ function initAssistant() {
 
 // Wire up events once DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
+  initDOMCache();
   initTheme();
   initTabs();
   initDemoLoader();
   initAssistant();
 
-  const form = document.querySelector("#footprint-form");
+  const form = DOM.footprintForm;
   if (form) {
     form.addEventListener("submit", handleCalculatorSubmit);
   }
 
-  const gotoCalcBtn = document.querySelector("#btn-goto-calculator");
+  const gotoCalcBtn = DOM.gotoCalcBtn;
   if (gotoCalcBtn) {
     gotoCalcBtn.addEventListener("click", () => {
       switchTab("tab-calculator");

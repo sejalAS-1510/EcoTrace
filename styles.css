@@ -21,7 +21,7 @@
   
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
+  --text-muted: #a1b0cb;
   
   --primary: #10b981;
   --primary-hover: #059669;
@@ -49,16 +49,16 @@
   --bg-card: #f8fafc;
   --bg-input: #ffffff;
   --border-color: #e2e8f0;
-  --border-hover: rgba(5, 150, 105, 0.25);
-  --border-active: #059669;
+  --border-hover: rgba(4, 120, 87, 0.25);
+  --border-active: #047857;
 
   --text-primary: #0f172a;
   --text-secondary: #475569;
-  --text-muted: #64748b;
+  --text-muted: #4b5563;
 
-  --primary: #059669;
-  --primary-hover: #047857;
-  --primary-glow: rgba(5, 150, 105, 0.15);
+  --primary: #047857;
+  --primary-hover: #03543f;
+  --primary-glow: rgba(4, 120, 87, 0.15);
   --secondary: #4f46e5;
   --secondary-glow: rgba(79, 70, 229, 0.1);
 
@@ -574,7 +574,7 @@ h3 {
 
 .category-badge[data-category="High"] {
   background-color: rgba(239, 68, 68, 0.15);
-  color: #f87171;
+  color: #fca5a5;
 }
 .theme-light .category-badge[data-category="High"] {
   background-color: rgba(239, 68, 68, 0.1);
@@ -1517,5 +1517,19 @@ h3 {
   justify-content: center;
   padding-top: 1rem;
   border-top: 1px solid var(--border-color);
+}
+
+/* Benchmark static widths to avoid inline HTML styles for strict CSP compliance */
+.benchmark-bar.user {
+  width: 0%;
+}
+.benchmark-bar.target-width {
+  width: 11.5%;
+}
+.benchmark-bar.world-width {
+  width: 30.7%;
+}
+.benchmark-bar.high-width {
+  width: 100%;
 }
 

@@ -22,28 +22,58 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-  // 1. Apply Hardened Security Headers (Best practice for public repos)
+  // 1. Validate HTTP request method (Only allow safe static content retrieval methods)
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    res.statusCode = 405;
+    res.setHeader("Content-Type", "text/plain");
+    res.setHeader("Allow", "GET, HEAD");
+    res.end("405 Method Not Allowed: Only GET and HEAD methods are supported.");
+    return;
+  }
+
+  // 2. Validate request URL format and filter malicious payloads (Null bytes)
+  if (req.url.includes("\0") || req.url.includes("%00")) {
+    res.statusCode = 400;
+    res.setHeader("Content-Type", "text/plain");
+    res.end("400 Bad Request: Null bytes are prohibited.");
+    return;
+  }
+
+  // 3. Apply Hardened Security Headers (Best practice for production environments)
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("X-XSS-Protection", "1; mode=block");
   res.setHeader("Referrer-Policy", "no-referrer-when-downgrade");
+  res.setHeader("X-Permitted-Cross-Domain-Policies", "none");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; script-src 'self'; img-src 'self' data:; connect-src 'self';"
+    "default-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; script-src 'self'; img-src 'self' data:; connect-src 'self';"
   );
 
   // Parse and normalize file path
-  let parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  } catch (e) {
+    res.statusCode = 400;
+    res.setHeader("Content-Type", "text/plain");
+    res.end("400 Bad Request: Invalid URL structure.");
+    return;
+  }
+
   let safePath = parsedUrl.pathname;
   if (safePath === "/") {
     safePath = "/index.html";
   }
 
   const filePath = path.join(__dirname, safePath);
-  const relativePath = path.relative(__dirname, filePath);
+  const resolvedPath = path.resolve(filePath);
+  const relativePath = path.relative(__dirname, resolvedPath);
   
-  // 2. Prevent Directory Traversal Vulnerability (Security compliance check)
-  if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+  // 4. Prevent Directory Traversal Vulnerability (Security compliance check)
+  if (relativePath.startsWith("..") || path.isAbsolute(relativePath) || !resolvedPath.startsWith(__dirname)) {
     res.statusCode = 403;
     res.setHeader("Content-Type", "text/plain");
     res.end("403 Forbidden: Access denied.");

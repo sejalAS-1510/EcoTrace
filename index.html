@@ -627,6 +627,13 @@
             aria-live="assertive"
             aria-atomic="true"
           ></div>
+
+          <div
+            id="results"
+            class="visually-hidden"
+            aria-live="polite"
+            aria-atomic="true"
+          ></div>
         </section>
 
         <!-- Tab 2: Insights Panel -->
@@ -948,7 +955,6 @@
                   <div
                     id="bench-user-bar"
                     class="benchmark-bar user"
-                    style="width: 0%"
                   ></div>
                 </div>
               </div>
@@ -960,7 +966,7 @@
                   <span class="benchmark-val">150 kg CO₂e</span>
                 </div>
                 <div class="benchmark-bar-container">
-                  <div class="benchmark-bar target" style="width: 11.5%"></div>
+                  <div class="benchmark-bar target target-width"></div>
                 </div>
                 <p class="benchmark-caption">
                   Target emissions per person per month to limit global warming
@@ -975,7 +981,7 @@
                   <span class="benchmark-val">400 kg CO₂e</span>
                 </div>
                 <div class="benchmark-bar-container">
-                  <div class="benchmark-bar world" style="width: 30.7%"></div>
+                  <div class="benchmark-bar world world-width"></div>
                 </div>
                 <p class="benchmark-caption">
                   Average per capita emissions across all countries globally.
@@ -989,7 +995,7 @@
                   <span class="benchmark-val">1,300 kg CO₂e</span>
                 </div>
                 <div class="benchmark-bar-container">
-                  <div class="benchmark-bar high" style="width: 100%"></div>
+                  <div class="benchmark-bar high high-width"></div>
                 </div>
                 <p class="benchmark-caption">
                   Average per capita emissions in high-consumption countries.
